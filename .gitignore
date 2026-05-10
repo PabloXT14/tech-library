@@ -1,0 +1,10 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+
+# DATABASE
+*.sqlite
+*.sqlite3
+*.db
