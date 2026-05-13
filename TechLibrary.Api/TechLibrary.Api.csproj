@@ -7,13 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Controllers\" />
+      <Folder Include="Domain\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TechLibrary.Communication\TechLibrary.Communication.csproj" />
+      <ProjectReference Include="..\TechLibrary.Exception\TechLibrary.Exception.csproj" />
     </ItemGroup>
 
 </Project>
