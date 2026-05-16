@@ -2,6 +2,7 @@ using FluentValidation.Results;
 using TechLibrary.Api.Domain.Entities;
 using TechLibrary.Api.Infrastructure.DataAccess;
 using TechLibrary.Api.Infrastructure.Security.Cryptography;
+using TechLibrary.Api.Infrastructure.Security.Tokens.Access;
 using TechLibrary.Communication.Requests;
 using TechLibrary.Communication.Responses;
 using TechLibrary.Exception;
@@ -25,14 +26,15 @@ public class RegisterUserUseCase
             Password = encryptedPassword
         };
 
-        dbContext.Users.Add(entity);
+        dbContext.Users.Add(entity); // Prepara a query
+        dbContext.SaveChanges(); // Executa a query
 
-        dbContext.SaveChanges();
-
+        var tokenGenerator = new JwtTokenGenerator();
+        
         return new ResponseRegisteredUserJson
         {
             Name = entity.Name,
-            AccessToken = Guid.NewGuid().ToString() // Gerar um token de acesso fictício
+            AccessToken = tokenGenerator.Generate(entity) // Gerar um token de acesso fictício
         };
     }
 
