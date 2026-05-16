@@ -1,3 +1,4 @@
+using FluentValidation.Results;
 using TechLibrary.Api.Domain.Entities;
 using TechLibrary.Api.Infrastructure.DataAccess;
 using TechLibrary.Api.Infrastructure.Security.Cryptography;
@@ -11,7 +12,9 @@ public class RegisterUserUseCase
 {
     public ResponseRegisteredUserJson Execute(RequestUserJson request)
     {
-        Validate(request);
+        var dbContext = new TechLibraryDbContext();
+        
+        Validate(request, dbContext);
         
         var encryptedPassword = BCryptAlgorithm.HashPassword(request.Password);
         
@@ -21,8 +24,6 @@ public class RegisterUserUseCase
             Email = request.Email,
             Password = encryptedPassword
         };
-
-        var dbContext = new TechLibraryDbContext();
 
         dbContext.Users.Add(entity);
 
@@ -35,11 +36,18 @@ public class RegisterUserUseCase
         };
     }
 
-    private void Validate(RequestUserJson request)
+    private void Validate(RequestUserJson request, TechLibraryDbContext dbContext)
     {
         var validator = new RegisterUserValidator();
         var validationResult = validator.Validate(request);
 
+        var emailAlreadyExists = dbContext.Users.Any(user => user.Email.Equals(request.Email));
+
+        if (emailAlreadyExists)
+        {
+            validationResult.Errors.Add(new ValidationFailure("Email", "Email já está em uso."));
+        }
+        
         if (!validationResult.IsValid)
         {
             var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
