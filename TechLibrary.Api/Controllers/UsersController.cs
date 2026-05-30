@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.Services.LoggedUser;
+using TechLibrary.Api.UseCases.Users.Get;
 using TechLibrary.Api.UseCases.Users.Register;
 using TechLibrary.Api.UseCases.Users.Update;
 using TechLibrary.Communication.Requests;
@@ -24,6 +25,21 @@ public class UsersController : ControllerBase
         return Created(string.Empty, response);
     }
 
+    [HttpGet]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseUserJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult Get()
+    {
+        var loggedUser = new LoggedUserService(HttpContext);
+
+        var useCase = new GetUserUseCase(loggedUser);
+
+        var response = useCase.Execute();
+
+        return Ok(response);
+    }
+    
     [HttpPut]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
