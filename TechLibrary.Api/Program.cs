@@ -1,4 +1,4 @@
-using System.Text;
+using System.Text;  
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -25,10 +25,8 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Insira um token JWT válido para se autenticar.",
     });
 
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference(AUTHENTICATION_TYPE, document)] = []
-    });
+    // Substitui o AddSecurityRequirement global pelo filter seletivo
+    options.OperationFilter<AuthorizeCheckOperationFilter>();
 });
 
 builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)));
@@ -60,6 +58,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
