@@ -17,6 +17,11 @@ public class DoLoginUseCase
 
         if (entity == null)
             throw new InvalidLoginException();
+        
+        var isEntityActive = entity.IsActive;
+
+        if (!isEntityActive)
+            throw new NotActiveException();
 
         var passwordMatches = BCryptAlgorithm.Verify(request.Password, entity);
 

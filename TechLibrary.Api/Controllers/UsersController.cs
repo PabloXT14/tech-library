@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.Services.LoggedUser;
+using TechLibrary.Api.UseCases.Users.Delete;
 using TechLibrary.Api.UseCases.Users.Get;
 using TechLibrary.Api.UseCases.Users.Register;
 using TechLibrary.Api.UseCases.Users.Update;
@@ -51,6 +52,20 @@ public class UsersController : ControllerBase
         var useCase = new UpdateUserUseCase(loggedUser);
 
         useCase.Execute(request);
+        
+        return NoContent();
+    }
+
+    [HttpDelete("{userId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status409Conflict)]
+    public IActionResult Delete([FromRoute] Guid userId)
+    {
+        var useCase = new DeleteUserUseCase();
+        
+        useCase.Execute(userId);
         
         return NoContent();
     }

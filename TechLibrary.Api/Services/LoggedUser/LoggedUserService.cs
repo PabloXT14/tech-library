@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using TechLibrary.Api.Domain.Entities;
 using TechLibrary.Api.Infrastructure.DataAccess;
+using TechLibrary.Exception;
 
 namespace TechLibrary.Api.Services.LoggedUser;
 
@@ -33,6 +34,11 @@ public class LoggedUserService
         // Obs: estamos usando First direto pois para chegar nessa parte da lógica do negócio o usuário precisa necessariamente estar autenticado
         var user = dbContext.Users.First(user => user.Id == userId);
             
+        if (!user.IsActive)
+        {
+            throw new NotActiveException();
+        }
+        
         return user;
     }
 }
