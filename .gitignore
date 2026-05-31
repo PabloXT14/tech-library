@@ -8,3 +8,10 @@ riderModule.iml
 *.sqlite
 *.sqlite3
 *.db
+
+# Environment variables
+.env
+
+# User secrets and development settings
+**/appsettings.Development.json
+**/user-secrets/
