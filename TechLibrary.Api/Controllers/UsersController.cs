@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.Services.LoggedUser;
+using TechLibrary.Api.UseCases.Users.Activate;
 using TechLibrary.Api.UseCases.Users.Delete;
 using TechLibrary.Api.UseCases.Users.Get;
 using TechLibrary.Api.UseCases.Users.Register;
@@ -67,6 +68,20 @@ public class UsersController : ControllerBase
         
         useCase.Execute(userId);
         
+        return NoContent();
+    }
+
+    [HttpPatch("active/{userId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status409Conflict)]
+    public IActionResult Activate([FromRoute] Guid userId)
+    {
+        var useCase = new ActivateUserUseCase();
+
+        useCase.Execute(userId);
+
         return NoContent();
     }
 }
