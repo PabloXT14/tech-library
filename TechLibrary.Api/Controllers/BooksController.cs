@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.UseCases.Books.Create;
 using TechLibrary.Api.UseCases.Books.Filter;
+using TechLibrary.Api.UseCases.Books.Get;
 using TechLibrary.Communication.Requests;
 using TechLibrary.Communication.Responses;
 
@@ -39,5 +40,17 @@ public class BooksController : ControllerBase
         var result = useCase.Execute(request);
         
         return Ok(result);
+    }
+
+    [HttpGet("{bookId}")]
+    [ProducesResponseType(typeof(ResponseBookJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    public IActionResult Get([FromRoute] Guid bookId)
+    {
+        var useCase = new GetBookUseCase();
+        
+        var response = useCase.Execute(bookId);
+        
+        return Ok(response);
     }
 }

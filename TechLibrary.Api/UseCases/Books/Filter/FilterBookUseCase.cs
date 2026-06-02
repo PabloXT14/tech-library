@@ -46,7 +46,8 @@ public class FilterBookUseCase
             {
                 Id = book.Id,
                 Title = book.Title,
-                Author = book.Author
+                Author = book.Author,
+                Amount = book.Amount
             }).ToList(),
             Pagination = new ResponsePaginationJson
             {
