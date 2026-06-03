@@ -1,3 +1,4 @@
+using FluentValidation.Results;
 using TechLibrary.Api.Domain.Entities;
 using TechLibrary.Api.Infrastructure.DataAccess;
 using TechLibrary.Api.Infrastructure.Security.Cryptography;
@@ -40,24 +41,22 @@ public class UpdateUserUseCase
 
     private void Validate(RequestUpdateUserJson request, User user)
     {
-        if (request.NewPassword == null)
-            return;
+        var validator = new UpdateUserValidator();
         
-        if (request.OldPassword == null)
-        {
-            throw new ErrorOnValidationException(["A senha antiga é obrigatória quando for definida uma nova senha."]);
-        }
+        var validationResult = validator.Validate(request);
 
-        if (request.NewPassword.Length < 6)
+        var isOldPasswordCorrect = request.OldPassword != null && BCryptAlgorithm.Verify(request.OldPassword, user);
+
+        if (request?.OldPassword?.Length > 0 && !isOldPasswordCorrect)
         {
-            throw new ErrorOnValidationException(["A nova senha deve conter no mínimo 6 caracteres."]);
+            validationResult.Errors.Add(new ValidationFailure("OldPassword", "A senha antiga está incorreta."));
         }
         
-        var isOldPasswordCorrect = BCryptAlgorithm.Verify(request.OldPassword, user);
-
-        if (!isOldPasswordCorrect)
+        if (!validationResult.IsValid)
         {
-            throw new ErrorOnValidationException(["A senha antiga está incorreta."]);
+            var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            
+            throw new ErrorOnValidationException(errorMessages);
         }
     }
 }
