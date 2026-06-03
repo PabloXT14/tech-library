@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.UseCases.Books.Create;
 using TechLibrary.Api.UseCases.Books.Filter;
 using TechLibrary.Api.UseCases.Books.Get;
+using TechLibrary.Api.UseCases.Books.Update;
 using TechLibrary.Communication.Requests;
 using TechLibrary.Communication.Responses;
 
@@ -52,5 +53,19 @@ public class BooksController : ControllerBase
         var response = useCase.Execute(bookId);
         
         return Ok(response);
+    }
+
+    [HttpPut("{bookId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status400BadRequest)]
+    public IActionResult Update([FromRoute] Guid bookId, [FromBody] RequestUpdateBookJson request)
+    {
+        var useCase = new UpdateBookUseCase();
+        
+        useCase.Execute(request, bookId);
+        
+        return NoContent();
     }
 }
