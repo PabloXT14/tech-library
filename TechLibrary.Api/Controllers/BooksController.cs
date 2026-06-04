@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.UseCases.Books.Create;
+using TechLibrary.Api.UseCases.Books.Delete;
 using TechLibrary.Api.UseCases.Books.Filter;
 using TechLibrary.Api.UseCases.Books.Get;
 using TechLibrary.Api.UseCases.Books.Update;
@@ -65,6 +66,19 @@ public class BooksController : ControllerBase
         var useCase = new UpdateBookUseCase();
         
         useCase.Execute(request, bookId);
+        
+        return NoContent();
+    }
+
+    [HttpDelete(("{bookId}"))]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    public IActionResult Delete([FromRoute] Guid bookId)
+    {
+        var useCase = new DeleteBookUseCase();
+        
+        useCase.Execute(bookId);
         
         return NoContent();
     }
