@@ -3,7 +3,7 @@ using TechLibrary.Api.Infrastructure.DataAccess;
 using TechLibrary.Api.Services.LoggedUser;
 using TechLibrary.Exception;
 
-namespace TechLibrary.Api.UseCases.Checkouts;
+namespace TechLibrary.Api.UseCases.Checkouts.Register;
 
 public class RegisterBookCheckoutUseCase
 {
