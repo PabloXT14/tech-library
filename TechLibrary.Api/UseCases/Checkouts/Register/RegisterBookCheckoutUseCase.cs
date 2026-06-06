@@ -19,10 +19,10 @@ public class RegisterBookCheckoutUseCase
     public void Execute(Guid bookId)
     {
         var dbContext = new TechLibraryDbContext();
-
-        Validate(dbContext, bookId);
         
         var user =  _loggedUserService.GetLoggedUser(dbContext);
+        
+        Validate(dbContext, bookId, user);
 
         var entity = new Checkout
         {
@@ -36,7 +36,7 @@ public class RegisterBookCheckoutUseCase
         dbContext.SaveChanges();
     }
 
-    private void Validate(TechLibraryDbContext dbContext, Guid bookId)
+    private void Validate(TechLibraryDbContext dbContext, Guid bookId, User user)
     {
         var book = dbContext.Books.FirstOrDefault(book => book.Id == bookId);
         
@@ -49,5 +49,12 @@ public class RegisterBookCheckoutUseCase
         
         if (amountBookNotReturned >= book.Amount)
             throw new ConflictException("Não há exemplares disponíveis para empréstimo.");
+        
+        var useAlreadyReservedBook = dbContext
+            .Checkouts
+            .Any(checkout => checkout.BookId == bookId && checkout.UserId == user.Id && checkout.ReturnedDate == null);
+        
+        if  (useAlreadyReservedBook)
+            throw new ConflictException("Usuário já possui um exemplar reservado deste livro.");
     }
 }
