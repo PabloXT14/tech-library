@@ -4,6 +4,8 @@ using TechLibrary.Api.Services.LoggedUser;
 using TechLibrary.Api.UseCases.Checkouts.Delete;
 using TechLibrary.Api.UseCases.Checkouts.Register;
 using TechLibrary.Api.UseCases.Checkouts.Return;
+using TechLibrary.Api.UseCases.Checkouts.Update;
+using TechLibrary.Communication.Requests;
 using TechLibrary.Communication.Responses;
 
 namespace TechLibrary.Api.Controllers;
@@ -30,7 +32,7 @@ public class CheckoutsController : ControllerBase
     }
     
     [HttpPatch]
-    [Route("{bookId}")]
+    [Route("{bookId}/return")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status409Conflict)]
@@ -44,7 +46,23 @@ public class CheckoutsController : ControllerBase
         
         return NoContent();
     }
-    
+
+    [HttpPatch]
+    [Route("{bookId}/update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    public IActionResult UpdateBook(Guid bookId, [FromBody] RequestUpdateCheckoutJson request)
+    {
+        var loggedUser = new LoggedUserService(HttpContext);
+        
+        var useCase = new UpdateCheckoutUseCase(loggedUser);
+        
+        useCase.Execute(bookId, request);
+        
+        return NoContent();
+    }
+
     [HttpDelete]
     [Route("{checkoutId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
