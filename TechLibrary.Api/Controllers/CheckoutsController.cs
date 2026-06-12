@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechLibrary.Api.Services.LoggedUser;
 using TechLibrary.Api.UseCases.Checkouts.Delete;
+using TechLibrary.Api.UseCases.Checkouts.Extend;
 using TechLibrary.Api.UseCases.Checkouts.Register;
 using TechLibrary.Api.UseCases.Checkouts.Return;
 using TechLibrary.Api.UseCases.Checkouts.Update;
@@ -23,14 +24,14 @@ public class CheckoutsController : ControllerBase
     public IActionResult BookCheckout(Guid bookId)
     {
         var loggedUser = new LoggedUserService(HttpContext);
-        
+
         var useCase = new RegisterBookCheckoutUseCase(loggedUser);
-        
+
         useCase.Execute(bookId);
-        
+
         return NoContent();
     }
-    
+
     [HttpPatch]
     [Route("{bookId}/return")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -39,27 +40,43 @@ public class CheckoutsController : ControllerBase
     public IActionResult ReturnBook(Guid bookId)
     {
         var loggedUser = new LoggedUserService(HttpContext);
-        
+
         var useCase = new ReturnBookUseCase(loggedUser);
-        
+
         useCase.Execute(bookId);
-        
+
         return NoContent();
     }
 
     [HttpPatch]
-    [Route("{bookId}/update")]
+    [Route("{checkoutId}/update")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
-    public IActionResult UpdateBook(Guid bookId, [FromBody] RequestUpdateCheckoutJson request)
+    public IActionResult UpdateBook(Guid checkoutId, [FromBody] RequestUpdateCheckoutJson request)
     {
         var loggedUser = new LoggedUserService(HttpContext);
-        
+
         var useCase = new UpdateCheckoutUseCase(loggedUser);
-        
-        useCase.Execute(bookId, request);
-        
+
+        useCase.Execute(checkoutId, request);
+
+        return NoContent();
+    }
+
+    [HttpPatch]
+    [Route("{checkoutId}/extend")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status409Conflict)]
+    public IActionResult ExtendCheckout(Guid checkoutId)
+    {
+        var loggedUser = new LoggedUserService(HttpContext);
+
+        var useCase = new ExtendCheckoutUseCase(loggedUser);
+
+        useCase.Execute(checkoutId);
+
         return NoContent();
     }
 
@@ -71,9 +88,9 @@ public class CheckoutsController : ControllerBase
     public IActionResult DeleteCheckout(Guid checkoutId)
     {
         var useCase = new DeleteCheckoutUseCase();
-        
+
         useCase.Execute(checkoutId);
-        
+
         return NoContent();
     }
 }
